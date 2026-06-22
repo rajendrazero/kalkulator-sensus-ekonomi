@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Biaya & Keuntungan Bisnis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #18bc9c;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #2ecc71;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            padding: 30px 15px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 35px;
+            font-size: 1rem;
+        }
+
+        .grid-input {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            border-left: 4px solid var(--secondary);
+            padding-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .input-durasi-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-durasi-group input {
+            width: 70px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fff;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(24, 188, 156, 0.15);
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-title {
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-periode {
+            width: auto;
+            min-width: 200px;
+            border-color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            background: var(--card-bg);
+            border-radius: 0 0 12px 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        .results-table th, .results-table td {
+            padding: 14px 18px;
+            font-size: 0.95rem;
+        }
+
+        .results-table th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .results-table td.text-left, .results-table th.text-left {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .results-table td.text-right, .results-table th.text-right {
+            text-align: right;
+        }
+
+        .results-table tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .row-total-pengeluaran {
+            background-color: #fef2f2 !important;
+            font-weight: 600;
+            color: #b91c1c;
+        }
+        
+        .row-total-pemasukan {
+            background-color: #eff6ff !important;
+            font-weight: 600;
+            color: #1d4ed8;
+        }
+
+        .results-table tr.highlight {
+            background-color: #f0fdf4 !important;
+            font-weight: bold;
+        }
+
+        .results-table tr.highlight td {
+            color: #166534;
+        }
+
+        .copy-cell-btn {
+            background: none;
+            border: none;
+            box-shadow: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px 8px;
+            min-width: auto;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s, transform 0.1s;
+        }
+
+        .copy-cell-btn:hover {
+            color: var(--primary);
+            background: #e2e8f0;
+            border-radius: 4px;
+            transform: scale(1.1);
+        }
+
+        .copy-cell-btn:active {
+            transform: scale(0.9);
+        }
+
+        .saran-card {
+            background: #fff;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 25px;
+            display: none;
+        }
+
+        .saran-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .saran-list {
+            padding-left: 20px;
+            font-size: 0.95rem;
+        }
+
+        .saran-list li {
+            margin-bottom: 8px;
+        }
+
+        .status-rugi { border-left: 6px solid var(--danger); background-color: #fef2f2; color: #991b1b; }
+        .status-pas { border-left: 6px solid var(--warning); background-color: #fffbeb; color: #92400e; }
+        .status-untung { border-left: 6px solid var(--success); background-color: #f0fdf4; color: #166534; }
+
+        @media (max-width: 768px) {
+            .grid-input { grid-template-columns: 1fr; }
+            .filter-container { flex-direction: column; align-items: flex-start; }
+            .select-periode { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kalkulator Keuangan Bisnis</h1>
+    <p class="subtitle">Analisis Keuangan Dinamis dengan Jenis Pendapatan Fleksibel</p>
+    
+    <div class="grid-input">
+        <div class="card">
+            <h3><i class="fa-solid fa-industry"></i> 1. Biaya Produksi</h3>
+            <div class="form-group">
+                <label>Setiap Periode</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="prod-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="prod-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nilai Nominal</label>
+                <input type="text" id="prod-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-gears"></i> 2. Biaya Operasional</h3>
+            <div class="form-group">
+                <label>Setiap Periode</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="oper-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="oper-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nilai Nominal</label>
+                <input type="text" id="oper-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-gavel"></i> 3. Biaya Non-Operasional</h3>
+            <div class="form-group">
+                <label>Setiap Periode</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="non-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="non-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nilai Nominal</label>
+                <input type="text" id="non-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-coins"></i> 4. Biaya Lainnya</h3>
+            <div class="form-group">
+                <label>Setiap Periode</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="other-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="other-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nilai Nominal</label>
+                <input type="text" id="other-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-users"></i> 5 & 6. Karyawan & Gaji</h3>
+            <div class="form-group">
+                <label>Jumlah Karyawan (Orang)</label>
+                <input type="number" id="emp-count" value="0" min="0" oninput="hitungKeuangan()">
+            </div>
+            <div class="form-group">
+                <label>Gaji Dibayar Setiap</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="salary-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="salary-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Gaji Pokok (Per Orang)</label>
+                <input type="text" id="salary-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-wallet"></i> 7. Pendapatan (Omset)</h3>
+            <div class="form-group">
+                <label>Jenis Pemasukan</label>
+                <select id="rev-kind" onchange="hitungKeuangan()">
+                    <option value="bersih" selected>Pendapatan Bersih (Net Profit)</option>
+                    <option value="kotor">Pendapatan Kotor (Omset/Revenue)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Setiap Periode</label>
+                <div class="input-durasi-group">
+                    <input type="number" id="rev-count" value="1" min="1" oninput="hitungKeuangan()">
+                    <select id="rev-type" onchange="hitungKeuangan()">
+                        <option value="hari">Hari</option>
+                        <option value="minggu">Minggu</option>
+                        <option value="bulan" selected>Bulan</option>
+                        <option value="tahun">Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nilai Nominal</label>
+                <input type="text" id="rev-val" value="Rp" oninput="formatInputRupiah(this); hitungKeuangan();">
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-container">
+        <div class="filter-title">
+            <i class="fa-solid fa-chart-line"></i> Proyeksi Hasil Perhitungan
+        </div>
+        <div>
+            <select id="select-periode" class="select-periode" onchange="hitungKeuangan()">
+                <option value="1">Per Hari</option>
+                <option value="7">Per Minggu (7 H)</option>
+                <option value="14">Per 2 Minggu (14 H)</option>
+                <option value="21">Per 3 Minggu (21 H)</option>
+                <option value="28">Per 4 Minggu (28 H)</option>
+                <option value="30" selected>Per Bulan (30 H)</option>
+                <option value="60">Per 2 Bulan (60 H)</option>
+                <option value="90">Per 3 Bulan (90 H)</option>
+                <option value="120">Per 4 Bulan (120 H)</option>
+                <option value="180">Per 6 Bulan (180 H)</option>
+                <option value="365">Per Tahun (365 H)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th class="text-left">Komponen Keuangan</th>
+                    <th class="text-right" id="header-periode">Nilai Terhitung</th>
+                    <th style="width: 80px;" class="text-right">Salin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-left">Jumlah Sumber Daya Manusia</td>
+                    <td class="text-right" id="res-emp">0 Orang</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-emp')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-left">Total Beban Gaji Karyawan</td>
+                    <td class="text-right" id="res-sal">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-sal')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-left">Biaya Produksi (HPP)</td>
+                    <td class="text-right" id="res-prod">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-prod')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-left">Biaya Operasional (OPEX)</td>
+                    <td class="text-right" id="res-oper">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-oper')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-left">Biaya Non-Operasional</td>
+                    <td class="text-right" id="res-non">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-non')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr>
+                    <td class="text-left">Biaya Lainnya</td>
+                    <td class="text-right" id="res-other">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" onclick="salinSel('res-other')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr class="row-total-pengeluaran">
+                    <td class="text-left">[TOTAL PENGELUARAN BIAYA]</td>
+                    <td class="text-right" id="res-total-expense">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" style="color:#b91c1c" onclick="salinSel('res-total-expense')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr class="row-total-pemasukan">
+                    <td class="text-left">[TOTAL PEMASUKAN OMSET]</td>
+                    <td class="text-right" id="res-total-income">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" style="color:#1d4ed8" onclick="salinSel('res-total-income')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+                <tr class="highlight">
+                    <td class="text-left">Keuntungan Bersih (Net Profit)</td>
+                    <td class="text-right" id="res-prof">Rp 0</td>
+                    <td class="text-right"><button class="copy-cell-btn" style="color:#166534" onclick="salinSel('res-prof')"><i class="fa-regular fa-copy"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="saran-box" class="saran-card">
+        <div id="saran-title" class="saran-title"></div>
+        <ul id="saran-list" class="saran-list"></ul>
+    </div>
+</div>
+
+<script>
+    function dapatkanNilaiHarian(nilai, tipe, jumlah) {
+        let totalHariUnit = 1;
+        let jml = parseFloat(jumlah);
+        
+        if (isNaN(jml) || jml <= 0) {
+            jml = 1; 
+        }
+
+        if (tipe === 'hari') totalHariUnit = 1;
+        else if (tipe === 'minggu') totalHariUnit = 7;
+        else if (tipe === 'bulan') totalHariUnit = 30;
+        else if (tipe === 'tahun') totalHariUnit = 365;
+
+        return nilai / (jml * totalHariUnit);
+    }
+
+    function formatRupiah(angka) {
+        const prefix = angka < 0 ? "-Rp " : "Rp ";
+        return prefix + Math.abs(Math.round(angka)).toLocaleString('id-ID');
+    }
+
+    function formatInputRupiah(input) {
+        let value = input.value.replace(/[^,\d]/g, '').toString();
+        let split = value.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        input.value = value ? 'Rp ' + rupiah : 'Rp';
+    }
+
+    function parseInputKeAngka(id) {
+        let val = document.getElementById(id).value;
+        let cleanVal = val.replace(/[^0-9]/g, '');
+        return parseFloat(cleanVal) || 0;
+    }
+
+    function hitungKeuangan() {
+        let pengaliHari = parseInt(document.getElementById('select-periode').value) || 30;
+        
+        let ePeriode = document.getElementById('select-periode');
+        document.getElementById('header-periode').innerText = "Estimasi " + ePeriode.options[ePeriode.selectedIndex].text;
+
+        // Hitung semua komponen pengeluaran harian
+        let prodDay = dapatkanNilaiHarian(parseInputKeAngka('prod-val'), document.getElementById('prod-type').value, document.getElementById('prod-count').value);
+        let operDay = dapatkanNilaiHarian(parseInputKeAngka('oper-val'), document.getElementById('oper-type').value, document.getElementById('oper-count').value);
+        let nonDay = dapatkanNilaiHarian(parseInputKeAngka('non-val'), document.getElementById('non-type').value, document.getElementById('non-count').value);
+        let otherDay = dapatkanNilaiHarian(parseInputKeAngka('other-val'), document.getElementById('other-type').value, document.getElementById('other-count').value); // Tambahan
+
+        let empCount = parseInt(document.getElementById('emp-count').value) || 0;
+        if (isNaN(empCount) || empCount < 0) empCount = 0;
+
+        let singleSalaryDay = dapatkanNilaiHarian(parseInputKeAngka('salary-val'), document.getElementById('salary-type').value, document.getElementById('salary-count').value);
+        let totalSalaryDay = singleSalaryDay * empCount;
+
+        // Total akumulasi pengeluaran harian (termasuk biaya lainnya)
+        let totalExpenseDay = prodDay + operDay + nonDay + otherDay + totalSalaryDay;
+
+        // Hitung pendapatan harian berdasarkan kategori Kotor / Bersih
+        let revInputDay = dapatkanNilaiHarian(parseInputKeAngka('rev-val'), document.getElementById('rev-type').value, document.getElementById('rev-count').value);
+        let revKind = document.getElementById('rev-kind').value;
+
+        let revDay = 0;
+        let profitDay = 0;
+
+        if (revKind === 'bersih') {
+            profitDay = revInputDay;
+            revDay = profitDay + totalExpenseDay;
+        } else {
+            revDay = revInputDay;
+            profitDay = revDay - totalExpenseDay;
+        }
+
+        // Cetak output terhitung akhir ke elemen DOM tabel
+        document.getElementById('res-emp').innerText = empCount + " Orang";
+        document.getElementById('res-sal').innerText = formatRupiah(totalSalaryDay * pengaliHari);
+        document.getElementById('res-prod').innerText = formatRupiah(prodDay * pengaliHari);
+        document.getElementById('res-oper').innerText = formatRupiah(operDay * pengaliHari);
+        document.getElementById('res-non').innerText = formatRupiah(nonDay * pengaliHari);
+        document.getElementById('res-other').innerText = formatRupiah(otherDay * pengaliHari); // Tambahan
+        
+        document.getElementById('res-total-expense').innerText = formatRupiah(totalExpenseDay * pengaliHari);
+        document.getElementById('res-total-income').innerText = formatRupiah(revDay * pengaliHari);
+        document.getElementById('res-prof').innerText = formatRupiah(profitDay * pengaliHari);
+
+        berikanSaranFinansial(profitDay, revDay, totalExpenseDay);
+    }
+
+    function berikanSaranFinansial(profitDay, revDay, expenseDay) {
+        let saranBox = document.getElementById('saran-box');
+        let saranTitle = document.getElementById('saran-title');
+        let saranList = document.getElementById('saran-list');
+        
+        saranBox.className = "saran-card"; 
+        saranList.innerHTML = ""; 
+        
+        if (revDay === 0 && expenseDay === 0) {
+            saranBox.style.display = "none";
+            return;
+        }
+
+        saranBox.style.display = "block";
+
+        if (profitDay < 0) {
+            saranBox.classList.add('status-rugi');
+            saranTitle.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> EVALUASI: Keuangan Negatif (Rugi / Arus Kas Tidak Balance)";
+            saranList.innerHTML = `
+                <li><strong>Efisiensi Biaya Operasional:</strong> Periksa kembali pos pengeluaran. Pangkas pengeluaran non-esensial sesegera mungkin.</li>
+                <li><strong>Tinjau Harga Jual:</strong> Jika biaya produksi (HPP) terlalu tinggi, pertimbangkan untuk menaikkan harga jual produk/jasa Anda secara perlahan.</li>
+                <li><strong>Produktivitas SDM:</strong> Evaluasi kontribusi jumlah karyawan (${parseInt(document.getElementById('emp-count').value)} orang) terhadap volume pendapatan bisnis.</li>
+            `;
+        } else if (profitDay === 0 || (profitDay > 0 && profitDay < (revDay * 0.1))) {
+            saranBox.classList.add('status-pas');
+            saranTitle.innerHTML = "<i class='fa-solid fa-hourglass-half'></i> PERINGATAN: Margin Keuntungan Sangat Tipis (Rentan)";
+            saranList.innerHTML = `
+                <li><strong>Naikkan Volume Penjualan:</strong> Bisnis Anda berada di titik impas. Genjot strategi pemasaran/promosi digital untuk mendongkrak omset kotor.</li>
+                <li><strong>Skala Ekonomis:</strong> Tingkatkan kuantitas pembelian bahan baku produksi ke supplier agar mendapatkan potongan harga grosir yang lebih besar.</li>
+            `;
+        } else {
+            saranBox.classList.add('status-untung');
+            saranTitle.innerHTML = "<i class='fa-solid fa-circle-check'></i> AMAN: Struktur Keuangan Sehat & Balance (Profit Bagus)";
+            saranList.innerHTML = `
+                <li><strong>Alokasi Dana Darurat:</strong> Amankan minimal 20%-30% dari keuntungan terkumpul ini ke pos cadangan kas perusahaan untuk kebutuhan darurat.</li>
+                <li><strong>Rencana Ekspansi:</strong> Struktur keuangan Anda siap untuk dikembangkan. Pertimbangkan peningkatan efisiensi mesin produksi atau optimasi jangkauan pasar.</li>
+            `;
+        }
+    }
+
+    function salinSel(idElemen) {
+        let teksAngka = document.getElementById(idElemen).innerText;
+        navigator.clipboard.writeText(teksAngka).then(() => {
+            alert('Berhasil menyalin nominal: "' + teksAngka + '"');
+        }).catch(err => {
+            alert('Gagal menyalin teks', err);
+        });
+    }
+
+    window.onload = function() {
+        hitungKeuangan();
+    };
+</script>
+
+</body>
+</html>
